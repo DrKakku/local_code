@@ -1,10 +1,11 @@
 import importlib
-import pkgutil
+import time
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 from rich import box
 from difflib import ndiff
+import inspect
 from db import log_submission
 
 console = Console()
@@ -24,24 +25,37 @@ class Runner:
         table.add_column("Expected", justify="left")
         table.add_column("Got", justify="left")
         table.add_column("Result", justify="center")
+        table.add_column("Time (s)", justify="center")
 
         for idx, test in enumerate(tests, 1):
-            expected = test.get("output")
+            args = test.get("input", ())
+            expected_val = test.get("output")
+            if expected_val is None:
+                expected_val = self.problem.reference_solution(*args)
+            expected_str = str(expected_val)
+
+            start = time.perf_counter()
             try:
-                got = self.problem.user_solution(*test.get("input"))
-                status = "✅" if got == expected else "❌"
+                got_val = self.problem.user_solution(*args)
+                status = "✅" if got_val == expected_val else "❌"
             except Exception as e:
-                got = f"Error: {e}"
+                got_val = f"Error: {e}"
                 status = "❌"
+            duration = time.perf_counter() - start
+            got_str = str(got_val)
 
-            table.add_row(str(idx), str(test.get("input")), str(expected), str(got), status)
+            table.add_row(
+                str(idx), str(args), expected_str, got_str, status, f"{duration:.4f}"
+            )
 
-            # log each submission
-            log_submission(self.name, 'correct' if status == '✅' else 'incorrect')
+            src = inspect.getsource(self.problem.user_solution)
+            log_submission(
+                self.name, idx, 'correct' if status=='✅' else 'incorrect',
+                duration, expected_str, got_str, src
+            )
 
             if status == "❌":
-                ref = self.problem.reference_solution(*test.get("input"))
-                diff = '\n'.join(ndiff(str(ref).split(), str(got).split()))
+                diff = '\n'.join(ndiff(expected_str.split(), got_str.split()))
                 console.print(Panel(diff, title="Difference (ref vs yours)"))
 
         console.print(table)
