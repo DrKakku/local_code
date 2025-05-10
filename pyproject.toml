@@ -1,0 +1,10 @@
+[project]
+name = "local-code"
+version = "0.1.0"
+description = "A competitive coding tool which helps you running and testing multiple usecases when trying to solve any problem"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "click>=8.1.8",
+    "rich>=14.0.0",
+]
