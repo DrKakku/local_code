@@ -10,6 +10,7 @@ from db import log_submission
 
 console = Console()
 
+
 class Runner:
     def __init__(self, problem_name: str):
         module_path = f"problems.{problem_name}"
@@ -50,12 +51,17 @@ class Runner:
 
             src = inspect.getsource(self.problem.user_solution)
             log_submission(
-                self.name, idx, 'correct' if status=='✅' else 'incorrect',
-                duration, expected_str, got_str, src
+                self.name,
+                idx,
+                "correct" if status == "✅" else "incorrect",
+                duration,
+                expected_str,
+                got_str,
+                src,
             )
 
             if status == "❌":
-                diff = '\n'.join(ndiff(expected_str.split(), got_str.split()))
+                diff = "\n".join(ndiff(expected_str.split(), got_str.split()))
                 console.print(Panel(diff, title="Difference (ref vs yours)"))
 
         console.print(table)

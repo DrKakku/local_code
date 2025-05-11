@@ -17,8 +17,8 @@ def parse_input(sig: str) -> tuple:
     """
     # wrap in parentheses to enforce tuple
     try:
-        node = ast.parse(f"({sig})", mode='eval')
-        result = eval(compile(node, '<input>', 'eval'))
+        node = ast.parse(f"({sig})", mode="eval")
+        result = eval(compile(node, "<input>", "eval"))
         if not isinstance(result, tuple):
             return (result,)
         return result
