@@ -13,55 +13,74 @@ console = Console()
 
 class Runner:
     def __init__(self, problem_name: str):
-        module_path = f"problems.{problem_name}"
-        self.module = importlib.import_module(module_path)
-        self.problem = self.module.Problem
+        module = importlib.import_module(f"problems.{problem_name}")
+        self.problem = module.Problem
         self.name = problem_name
 
     def run_tests(self, custom_tests=None):
         tests = custom_tests or self.problem.tests
-        table = Table(title=self.problem.title, box=box.SIMPLE)
-        table.add_column("Case", justify="center")
-        table.add_column("Input", justify="left")
-        table.add_column("Expected", justify="left")
-        table.add_column("Got", justify="left")
-        table.add_column("Result", justify="center")
-        table.add_column("Time (s)", justify="center")
+        total = len(tests)
+        passed = 0
+        times = []
+        fail_details = []
 
         for idx, test in enumerate(tests, 1):
             args = test.get("input", ())
             expected_val = test.get("output")
             if expected_val is None:
                 expected_val = self.problem.reference_solution(*args)
-            expected_str = str(expected_val)
+            exp_str = str(expected_val)
 
             start = time.perf_counter()
             try:
                 got_val = self.problem.user_solution(*args)
-                status = "✅" if got_val == expected_val else "❌"
+                status = got_val == expected_val
             except Exception as e:
                 got_val = f"Error: {e}"
-                status = "❌"
-            duration = time.perf_counter() - start
-            got_str = str(got_val)
+                status = False
+            dur = time.perf_counter() - start
+            times.append(dur)
 
-            table.add_row(
-                str(idx), str(args), expected_str, got_str, status, f"{duration:.4f}"
-            )
-
-            src = inspect.getsource(self.problem.user_solution)
             log_submission(
                 self.name,
                 idx,
-                "correct" if status == "✅" else "incorrect",
-                duration,
-                expected_str,
-                got_str,
-                src,
+                "correct" if status else "incorrect",
+                dur,
+                exp_str,
+                str(got_val),
+                inspect.getsource(self.problem.user_solution),
             )
 
-            if status == "❌":
-                diff = "\n".join(ndiff(expected_str.split(), got_str.split()))
-                console.print(Panel(diff, title="Difference (ref vs yours)"))
+            if status:
+                passed += 1
+            else:
+                fail_details.append((idx, args, exp_str, str(got_val), dur))
 
+        avg_time = sum(times) / total if total else 0
+        # Summary
+        console.print(
+            Panel(f"Passed {passed}/{total} tests. Avg time: {avg_time:.4f}s")
+        )
+
+        # Table of failures or all if <=10
+        display_all = total <= 10
+        table = Table(title=self.problem.title, box=box.SIMPLE)
+        table.add_column("#")
+        table.add_column("Input")
+        table.add_column("Expected")
+        table.add_column("Got")
+        table.add_column("Time (s)")
+        if display_all:
+            for idx, test in enumerate(tests, 1):
+                exp = str(
+                    test.get("output")
+                    if test.get("output") is not None
+                    else self.problem.reference_solution(*test.get("input", ()))
+                )
+                got = str(self.problem.user_solution(*test.get("input", ())))
+                dur = f"{times[idx - 1]:.4f}"
+                table.add_row(str(idx), str(test.get("input")), exp, got, dur)
+        else:
+            for idx, inp, exp, got, dur in fail_details:
+                table.add_row(str(idx), str(inp), exp, got, f"{dur:.4f}")
         console.print(table)

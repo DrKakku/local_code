@@ -11,6 +11,27 @@ Tired of copying and pasting problems into online judges? Want a sandbox where y
 - **Timing Metrics**: See how your solution stacks up in milliseconds.
 - **Submission History**: Log every run’s input, expected, actual, runtime, and timestamp.
 - **Template Problem**: Drop in a new problem in seconds.
+- 
+### New Features
+
+#### ✅ Test Case Summary & Analytics
+- Displays:
+  - Total test cases
+  - Passed/failed count
+  - Average execution time
+  - Optionally shows failed test case details only (if >10)
+
+#### 🛠️ CLI Problem File Generator
+Run:
+```bash
+runcode create
+```
+Prompts you to enter:
+- Problem name (e.g., `two_sum`)
+- Function signature
+- Example test cases
+
+Automatically creates a stub in `problems/{problem_name}.py`.
 
 ## 📦 Getting Started
 

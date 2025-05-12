@@ -4,6 +4,7 @@ import problems
 from runner import Runner
 from utils import parse_input, prompt_for_args
 from db import init_db, fetch_history
+from problem_creator import main as create_problem
 from rich.console import Console
 from rich.table import Table
 
@@ -18,10 +19,8 @@ def cli():
 
 @cli.command("list")
 def _list():
-    modules = [name for _, name, _ in pkgutil.iter_modules(problems.__path__)]
-    console.print("Available problems:")
-    for m in modules:
-        console.print(f"- {m}")
+    for _, name, _ in pkgutil.iter_modules(problems.__path__):
+        console.print(f"- {name}")
 
 
 @cli.command()
@@ -29,12 +28,12 @@ def _list():
 @click.option("--all", "run_all", is_flag=True)
 def run(problem, run_all):
     if run_all:
-        for name in [n for _, n, _ in pkgutil.iter_modules(problems.__path__)]:
+        for _, name, _ in pkgutil.iter_modules(problems.__path__):
             console.print(f"\nRunning: {name}")
             Runner(name).run_tests()
     else:
         if not problem:
-            console.print("Error: specify problem or --all")
+            console.print("Specify a problem or --all")
             return
         Runner(problem).run_tests()
 
@@ -47,38 +46,30 @@ def custom(problem):
 
 
 @cli.command()
-@click.option("--problem", "-p", default=None)
+@click.option("--problem", "-p")
 @click.option("--full", "-f", is_flag=True)
 @click.option("--limit", "-l", type=int)
-@click.option("--id", "entry_id", type=int, help="Show specific entry by ID")
+@click.option("--id", "entry_id", type=int)
 def history(problem, full, limit, entry_id):
     rows = fetch_history(problem, entry_id)
     if limit:
         rows = rows[:limit]
-    table = Table(title="Submission History")
-    table.add_column("ID")
-    table.add_column("Problem")
-    table.add_column("Case #")
-    table.add_column("Status")
-    table.add_column("Time (s)")
-    table.add_column("Expected")
-    table.add_column("Actual")
-    table.add_column("Timestamp")
-    table.add_column("Solution")
-    for id_, prob, case_idx, status, duration, expected, actual, sol, ts in rows:
-        sol_display = sol if full else sol.strip().splitlines()[0] + " ..."
+    table = Table(title="History")
+    cols = ["ID", "Prob", "Case", "Status", "Time", "Exp", "Act", "TimeStamp", "Sol"]
+    for col in cols:
+        table.add_column(col)
+    for r in rows:
+        id_, prob, idx, st, dur, exp, act, sol, ts = r
+        sol_disp = sol if full else sol.splitlines()[0] + " ..."
         table.add_row(
-            str(id_),
-            prob,
-            str(case_idx),
-            status,
-            f"{duration:.4f}",
-            expected,
-            actual,
-            ts,
-            sol_display,
+            str(id_), prob, str(idx), st, f"{dur:.4f}", exp, act, ts, sol_disp
         )
     console.print(table)
+
+
+@cli.command()
+def create():
+    create_problem()
 
 
 if __name__ == "__main__":
