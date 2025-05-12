@@ -17,9 +17,10 @@ class Problem:
         return x == reverted_number or x == reverted_number // 10
 
     @staticmethod
-    def reference_solution(*args) -> Any:
+    def reference_solution(x:int) -> Any:
         # Provide a correct reference solution here
-        raise NotImplementedError("Implement reference_solution")
+        print(f"Implement reference_solution with arguments {x}")
+        return True
 
     tests = [
         # Example test case:
@@ -28,6 +29,17 @@ class Problem:
         {"input": (10,), "output": False},
         {"input": (12321,), "output": True},
         {"input": (0,), "output": True},
+        {"input": (1234321,), "output": None},
+        {"input": (12345678987654321,), "output": True},
+        {"input": (1234567898765432,), "output": False},
+        {"input": (123456789876543210,), "output": False},
+        {"input": (1234567898765432100,), "output": False},
+        {"input": (1234567898765432101,), "output": False},
+        {"input": (12345678987654321012,), "output": False},
+        {"input": (12345678987654321012345678987654321,), "output": True},
+        {"input": (123456789876543210123456789876543210,), "output": False},
+        {"input": (1234567898765432101234567898765432101,), "output": False},
+        {"input": (12345678987654321012345678987654321012,), "output": False},
         # Example test case:
         # {"input": ([arg1, arg2, ...],), "output": expected_output},
     ]
