@@ -4,8 +4,8 @@ from rich.console import Console
 from rich.prompt import Prompt
 from rich.table import Table
 import problems as problems
-from runner import Runner
-from db import fetch_history
+from utilites.runner import Runner
+from utilites.db import fetch_history
 
 console = Console()
 

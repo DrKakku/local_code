@@ -7,7 +7,7 @@ from rich.table import Table
 from rich.panel import Panel
 from rich import box
 import inspect
-from db import log_submission
+from utilites.db import log_submission
 
 console = Console()
 

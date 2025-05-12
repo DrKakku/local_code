@@ -2,9 +2,9 @@ import click
 import pkgutil
 from rich.console import Console
 from utilites.utils import safe_command
-from runner import Runner
-from db import init_db
-from problem_creator import main as create_problem
+from utilites.runner import Runner
+from utilites.db import init_db
+from utilites.problem_creator import main as create_problem
 from utilites.helpers import choose_problem, _run_custom_tests, _fetch_and_display_history
 import problems
 
