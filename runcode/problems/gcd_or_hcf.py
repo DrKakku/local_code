@@ -18,10 +18,10 @@ The Greatest Common Divisor (GCD) of two integers is the largest positive intege
     def user_solution(n1: int, n2: int) -> Any:
         ## Using Euclidean Algorithm to find GCD
         while n1 > 0 and n2 > 0:
-            n1 , n2 = max(n1,n2)-min(n1,n2),min(n1,n2)
+            n1, n2 = max(n1, n2) - min(n1, n2), min(n1, n2)
 
-        print(n1,n2)
-        return max(n1,n2)
+        print(n1, n2)
+        return max(n1, n2)
 
     @staticmethod
     def reference_solution(n1: int, n2: int) -> Any:

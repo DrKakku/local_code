@@ -1,30 +1,37 @@
 from typing import List, Any
 
 
-
 class Problem:
     title: str = "Check if a number is Armstrong Number or not"
-    description: str = (
-        """Given an integer N (0 <= N <= 5000), return True if it is an Armstrong number, otherwise return False.
+    description: str = """Given an integer N (0 <= N <= 5000), return True if it is an Armstrong number, otherwise return False.
 
 An Armstrong number is a number that is equal to the sum of its own digits each raised to the power of the number of digits.
 
 For example, 153 is an Armstrong number because 1³ + 5³ + 3³ = 153."""
-    )
 
     @staticmethod
-    def user_solution(n:int) -> Any:
+    def user_solution(n: int) -> Any:
         """
         Your solution here.
         """
-        if 0<=n<=5000:
+        if 0 > n or n > 5000:
             return False
+        print(0 >= n >= 5000)
+        num_arr = [int(i) for i in str(n) ]
+        print(num_arr)
+        num_sum = [(lambda x : x**len(num_arr))(i)for i in num_arr]
+        print(num_sum)
+        num_sum = sum(num_sum)
+        print(num_sum)
+        if num_sum == n:
+            return True
+        return False
 
     @staticmethod
     def reference_solution(n: int) -> bool:
         digits = list(map(int, str(n)))
         power = len(digits)
-        return sum(d ** power for d in digits) == n
+        return sum(d**power for d in digits) == n
 
     # TEST CASES:
     tests: List[dict] = [
@@ -44,8 +51,10 @@ For example, 153 is an Armstrong number because 1³ + 5³ + 3³ = 153."""
         {"input": (371,), "output": True},
         {"input": (407,), "output": True},
         {"input": (1634,), "output": True},
-        {"input": (8208,), "output": False},  # > 5000, included just to clarify the limit
-
+        {
+            "input": (8208,),
+            "output": False,
+        },  # > 5000, included just to clarify the limit
         # Boundary and near-boundary non-Armstrong numbers
         {"input": (10,), "output": False},
         {"input": (99,), "output": False},
