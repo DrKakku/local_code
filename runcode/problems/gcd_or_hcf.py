@@ -23,7 +23,7 @@ The Greatest Common Divisor (GCD) of two integers is the largest positive intege
         args will match the tuple you specify in tests.
         """
         while n2:
-            n1, n2 = n2, n1 // n2  # Example Error
+            n1, n2 = n2, n1 % n2  # Example Error
         return n1
 
     @staticmethod

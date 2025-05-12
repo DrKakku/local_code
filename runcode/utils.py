@@ -1,6 +1,7 @@
 import ast
 from rich.prompt import Prompt
 from rich.console import Console
+from rich import print as rprint  # <-- use rich.print for global printing
 
 
 def parse_input(sig: str) -> tuple:
@@ -23,3 +24,16 @@ def prompt_for_args() -> tuple:
     except ValueError as e:
         console.print(f"[red]{e}[/red]")
         return prompt_for_args()
+
+def safe_command(fn):
+    """
+    Decorator to catch exceptions in CLI commands and print errors gracefully.
+    """
+    def wrapped(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as e:
+            rprint(f"[bold red]Error:[/bold red] {e}")
+    return wrapped
+
+
