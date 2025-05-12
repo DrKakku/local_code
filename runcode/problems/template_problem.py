@@ -7,9 +7,12 @@ from typing import List, Any
 #      - "input": a tuple of arguments to pass to your functions
 #      - "output": the expected output (optional; if omitted or None, ref sol is used)
 
+
 class Problem:
     title: str = "<Problem Title>"  # e.g. "Two Sum"
-    description: str = "<Problem Description>"  # e.g. "Return indices of two nums adding to target."
+    description: str = (
+        "<Problem Description>"  # e.g. "Return indices of two nums adding to target."
+    )
 
     @staticmethod
     def user_solution(*args) -> Any:

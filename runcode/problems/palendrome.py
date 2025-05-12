@@ -1,12 +1,13 @@
 from typing import List, Any
 
+
 # TEMPLATE PROBLEM
 class Problem:
     title = "Palendrome Number"
     description = ""
 
     @staticmethod
-    def user_solution(x:int) -> Any:
+    def user_solution(x: int) -> Any:
         if x < 0 or (x % 10 == 0 and x != 0):
             return False
         reverted_number = 0

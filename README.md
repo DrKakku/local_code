@@ -12,80 +12,76 @@ Tired of copying and pasting problems into online judges? Want a sandbox where y
 - **Submission History**: Log every run’s input, expected, actual, runtime, and timestamp.
 - **Template Problem**: Drop in a new problem in seconds.
 
+### New Features 🎉
+
+#### ✅ Test Case Summary & Analytics
+- Displays:
+  - Total test cases
+  - Passed/failed count
+  - Average execution time
+- Hides full table if > 10 tests, shows only failures.
+
+#### 🧪 Fancy Test Details
+- Colorful tables with emojis per row:
+  - 🎉 PASS in green or 💥 FAIL in red
+  - Columns for Input, Expected, Got, Time, and Std Output
+
+#### 🛠️ CLI Problem File Generator
+Run:
+```bash
+runcode create
+# or use `uv create` for a shortcut!
+```
+Prompts you to enter:
+- Problem filename
+- Title & detailed description (multi-line!)
+- Test cases (input & optional expected)
+
+Automatically scaffolds `problems/{problem_name}.py` from templates.
+
+---
+
 ## 📦 Getting Started
 
-### 1. Clone & Install
+### 1. Install
 
 ```bash
 git clone https://github.com/yourusername/runcode.git
 cd runcode
 pip install -r requirements.txt
-``` 
+```
+Or, after publishing:
+```bash
+pip install local-code
+```
 
 ### 2. Quickstart
 
-Run a single problem:
 ```bash
+python -m runcode list          # List available problems
 python -m runcode run sample_problem
-```
-
-Run **all** problems:
-```bash
 python -m runcode run --all
 ```
 
-### 3. Create Your Own Problem
+### 3. Create & Solve
 
 ```bash
-cp problems/template_problem.py problems/my_awesome_problem.py
-# Edit title, description, and tests.
-``` 
-
-Test cases are defined as:
-```python
-{
-  "input": ([arg1, arg2, ...],),
-  "output": <expected>  # Optional: if omitted or None, `reference_solution` is used.
-}
+python3 runcode create               # Scaffold a new problem
+python3 runcode run my_problem       # Run tests
+python3 runcode custom my_problem    # Interactive custom-case mode
 ```
 
-### 4. Custom Tests
+### 4. Check History
 
 ```bash
-python -m runcode custom my_awesome_problem
-``` 
-Enter something like `[1,2,3], 4` and watch!
-
-### 5. Inspect Your Code
-
-- Preview history:
-  ```bash
-  python -m runcode history
-  ```  
-- Full code:
-  ```bash
-  python -m runcode history --full
-  ```
-- Last 2 runs of `sample_problem`:
-  ```bash
-  python -m runcode history -p sample_problem -l 2
-  ```
-- Specific entry by ID:
-  ```bash
-  python -m runcode history --id 5
-  ```
-
-## 🛠️ Advanced Setup
-
-You can streamline things even more with our `setup.sh`:
-```bash
-chmod +x setup.sh
-./setup.sh
+python3 runcode history              # Preview recent runs
+python3 runcode history --full       # Show full code
+python3 runcode history -p two_sum -l 3  # Last 3 runs for two_sum
+python3 runcode history --id 5       # View entry #5
 ```
-This will create a virtual environment, install dependencies, and get you coding in style. 🕶️
 
 ---
 
 > "First, solve the problem. Then, write the code." — John Johnson 🚀
 
-Happy coding, and may all your submissions be **Accepted**! 🌟
+Happy coding & may the ACs be ever in your favor! 🍀✨
