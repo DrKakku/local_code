@@ -1,86 +1,86 @@
 import importlib
 import time
+import io
+from contextlib import redirect_stdout
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 from rich import box
-from difflib import ndiff
 import inspect
 from db import log_submission
 
 console = Console()
 
-
 class Runner:
     def __init__(self, problem_name: str):
         module = importlib.import_module(f"problems.{problem_name}")
-        self.problem = module.Problem
+        self.Problem = module.Problem
         self.name = problem_name
 
     def run_tests(self, custom_tests=None):
-        tests = custom_tests or self.problem.tests
-        total = len(tests)
-        passed = 0
-        times = []
-        fail_details = []
+        tests = custom_tests or self.Problem.tests
+        results = [self._run_single(idx, test) for idx, test in enumerate(tests, 1)]
+        self._print_summary(results)
+        self._print_details(results)
 
-        for idx, test in enumerate(tests, 1):
-            args = test.get("input", ())
-            expected_val = test.get("output")
-            if expected_val is None:
-                expected_val = self.problem.reference_solution(*args)
-            exp_str = str(expected_val)
-
-            start = time.perf_counter()
+    def _run_single(self, idx, test):
+        args = test.get("input", ())
+        expected = test.get("output")
+        if expected is None:
+            expected = self.Problem.reference_solution(*args)
+        exp_str = str(expected)
+        buf = io.StringIO()
+        start = time.perf_counter()
+        with redirect_stdout(buf):
             try:
-                got_val = self.problem.user_solution(*args)
-                status = got_val == expected_val
+                got_val = self.Problem.user_solution(*args)
+                status = got_val == expected
             except Exception as e:
                 got_val = f"Error: {e}"
                 status = False
-            dur = time.perf_counter() - start
-            times.append(dur)
+        duration = time.perf_counter() - start
+        out_str = buf.getvalue().strip()
+        log_submission(self.name, idx,
+                       'correct' if status else 'incorrect',
+                       duration, exp_str, str(got_val),
+                       inspect.getsource(self.Problem.user_solution))
+        return {"idx":idx, "input":args, "exp":exp_str,
+                "got":str(got_val), "time":duration,
+                "out":out_str, "status":status}
 
-            log_submission(
-                self.name,
-                idx,
-                "correct" if status else "incorrect",
-                dur,
-                exp_str,
-                str(got_val),
-                inspect.getsource(self.problem.user_solution),
+    def _print_summary(self, results):
+        total = len(results)
+        passed = sum(r["status"] for r in results)
+        avg_time = sum(r["time"] for r in results) / total if total else 0
+        tbl = Table(box=box.SIMPLE_HEAVY)
+        for label, val in [("🎯 Total", total), ("✅ Passed", passed),
+                           ("❌ Failed", total - passed), ("⏱️ Avg(s)", f"{avg_time:.4f}")]:
+            tbl.add_column(label, justify="center")
+        tbl.add_row(*(str(v) for v in [total, passed, total-passed, f"{avg_time:.4f}"]))
+        console.print(Panel(tbl, title="🚀 Test Summary 🚀", box=box.ROUNDED))
+
+    def _print_details(self, results):
+        total = len(results)
+        show_all = total <= 10
+        tbl = Table(title="🧪 Test Details 🧪", box=box.ROUNDED)
+        tbl.add_column("🔢 #")
+        tbl.add_column("🔎 Input")
+        tbl.add_column("🔍 Status")
+        tbl.add_column("✅ Expected")
+        tbl.add_column("❌ Got")
+        tbl.add_column("⏱️ Time")
+        tbl.add_column("📤 StdOut")
+        rows = results if show_all else [r for r in results if not r["status"]]
+        for r in rows:
+            emoji = "🎉" if r["status"] else "💥"
+            status_text = "[green]PASS[/green]" if r["status"] else "[red]FAIL[/red]"
+            tbl.add_row(
+                emoji + str(r["idx"]),
+                str(r["input"]),
+                status_text,
+                r["exp"],
+                r["got"],
+                f"{r['time']:.4f}",
+                r["out"]
             )
-
-            if status:
-                passed += 1
-            else:
-                fail_details.append((idx, args, exp_str, str(got_val), dur))
-
-        avg_time = sum(times) / total if total else 0
-        # Summary
-        console.print(
-            Panel(f"Passed {passed}/{total} tests. Avg time: {avg_time:.4f}s")
-        )
-
-        # Table of failures or all if <=10
-        display_all = total <= 10
-        table = Table(title=self.problem.title, box=box.SIMPLE)
-        table.add_column("#")
-        table.add_column("Input")
-        table.add_column("Expected")
-        table.add_column("Got")
-        table.add_column("Time (s)")
-        if display_all:
-            for idx, test in enumerate(tests, 1):
-                exp = str(
-                    test.get("output")
-                    if test.get("output") is not None
-                    else self.problem.reference_solution(*test.get("input", ()))
-                )
-                got = str(self.problem.user_solution(*test.get("input", ())))
-                dur = f"{times[idx - 1]:.4f}"
-                table.add_row(str(idx), str(test.get("input")), exp, got, dur)
-        else:
-            for idx, inp, exp, got, dur in fail_details:
-                table.add_row(str(idx), str(inp), exp, got, f"{dur:.4f}")
-        console.print(table)
+        console.print(Panel(tbl, title="🔬 Detailed Results", box=box.ROUNDED))
