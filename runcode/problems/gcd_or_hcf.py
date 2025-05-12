@@ -16,15 +16,12 @@ The Greatest Common Divisor (GCD) of two integers is the largest positive intege
 
     @staticmethod
     def user_solution(n1: int, n2: int) -> Any:
-        """
-        Your solution here. Example:
-            def user_solution(nums: List[int], target: int) -> List[int]:
-                # write code
-        args will match the tuple you specify in tests.
-        """
-        while n2:
-            n1, n2 = n2, n1 // n2  # Example Error
-        return n1
+        ## Using Euclidean Algorithm to find GCD
+        while n1 > 0 and n2 > 0:
+            n1 , n2 = max(n1,n2)-min(n1,n2),min(n1,n2)
+
+        print(n1,n2)
+        return max(n1,n2)
 
     @staticmethod
     def reference_solution(n1: int, n2: int) -> Any:
