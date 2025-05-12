@@ -12,9 +12,9 @@ from rich.prompt import Prompt
 import ast
 
 
-
 console = Console()
 init_db()
+
 
 def choose_problem():
     modules = [name for _, name, _ in pkgutil.iter_modules(problems.__path__)]
@@ -38,16 +38,18 @@ def choose_problem():
 def cli():
     pass
 
+
 @safe_command
 @cli.command("list")
 def _list():
     for _, name, _ in pkgutil.iter_modules(problems.__path__):
         console.print(f"- {name}")
 
+
 @safe_command
 @cli.command()
-@click.argument('problem', required=False)
-@click.option('--all', 'run_all', is_flag=True)
+@click.argument("problem", required=False)
+@click.option("--all", "run_all", is_flag=True)
 def run(problem, run_all):
     """
     Run tests for a problem, or all problems. If no problem specified, prompt user to choose one interactively.
@@ -68,13 +70,14 @@ def run(problem, run_all):
     except Exception as e:
         console.print(f"[bold red]An error occurred:[/bold red] {e}")
 
+
 @safe_command
 @cli.command()
 @click.argument("problem", required=False)
 def custom(problem):
     """
-        Run custom test cases for a problem, optionally with expected output.
-        """
+    Run custom test cases for a problem, optionally with expected output.
+    """
     # 1) Choose problem if none specified
     if not problem:
         problem = choose_problem()
@@ -95,6 +98,7 @@ def custom(problem):
     # 4) Build the test case and run it
     custom_tests = [{"input": args, "output": expected}]
     Runner(problem).run_tests(custom_tests)
+
 
 @safe_command
 @cli.command()
@@ -119,6 +123,7 @@ def history(problem, full, limit, entry_id):
             str(id_), prob, str(idx), st, f"{dur:.4f}", exp, act, ts, sol_disp
         )
     console.print(table)
+
 
 @safe_command
 @cli.command()

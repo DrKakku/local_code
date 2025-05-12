@@ -11,6 +11,7 @@ from db import log_submission
 
 console = Console()
 
+
 class Runner:
     def __init__(self, problem_name: str):
         module = importlib.import_module(f"problems.{problem_name}")
@@ -40,23 +41,40 @@ class Runner:
                 status = False
         duration = time.perf_counter() - start
         out_str = buf.getvalue().strip()
-        log_submission(self.name, idx,
-                       'correct' if status else 'incorrect',
-                       duration, exp_str, str(got_val),
-                       inspect.getsource(self.Problem.user_solution))
-        return {"idx":idx, "input":args, "exp":exp_str,
-                "got":str(got_val), "time":duration,
-                "out":out_str, "status":status}
+        log_submission(
+            self.name,
+            idx,
+            "correct" if status else "incorrect",
+            duration,
+            exp_str,
+            str(got_val),
+            inspect.getsource(self.Problem.user_solution),
+        )
+        return {
+            "idx": idx,
+            "input": args,
+            "exp": exp_str,
+            "got": str(got_val),
+            "time": duration,
+            "out": out_str,
+            "status": status,
+        }
 
     def _print_summary(self, results):
         total = len(results)
         passed = sum(r["status"] for r in results)
         avg_time = sum(r["time"] for r in results) / total if total else 0
         tbl = Table(box=box.SIMPLE_HEAVY)
-        for label, val in [("🎯 Total", total), ("✅ Passed", passed),
-                           ("❌ Failed", total - passed), ("⏱️ Avg(s)", f"{avg_time:.4f}")]:
+        for label, val in [
+            ("🎯 Total", total),
+            ("✅ Passed", passed),
+            ("❌ Failed", total - passed),
+            ("⏱️ Avg(s)", f"{avg_time:.4f}"),
+        ]:
             tbl.add_column(label, justify="center")
-        tbl.add_row(*(str(v) for v in [total, passed, total-passed, f"{avg_time:.4f}"]))
+        tbl.add_row(
+            *(str(v) for v in [total, passed, total - passed, f"{avg_time:.4f}"])
+        )
         console.print(Panel(tbl, title="🚀 Test Summary 🚀", box=box.ROUNDED))
 
     def _print_details(self, results):
@@ -81,6 +99,6 @@ class Runner:
                 r["exp"],
                 r["got"],
                 f"{r['time']:.4f}",
-                r["out"]
+                r["out"],
             )
         console.print(Panel(tbl, title="🔬 Detailed Results", box=box.ROUNDED))

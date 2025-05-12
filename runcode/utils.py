@@ -25,15 +25,16 @@ def prompt_for_args() -> tuple:
         console.print(f"[red]{e}[/red]")
         return prompt_for_args()
 
+
 def safe_command(fn):
     """
     Decorator to catch exceptions in CLI commands and print errors gracefully.
     """
+
     def wrapped(*args, **kwargs):
         try:
             return fn(*args, **kwargs)
         except Exception as e:
             rprint(f"[bold red]Error:[/bold red] {e}")
+
     return wrapped
-
-
