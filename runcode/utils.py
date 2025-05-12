@@ -1,37 +1,40 @@
 import ast
-from typing import Any
 from rich.prompt import Prompt
-from runner import Runner
+from rich.console import Console
+from rich import print as rprint  # <-- use rich.print for global printing
 
 
 def parse_input(sig: str) -> tuple:
     """
-    Safely parse a comma-separated list of Python literals.
-
-    Examples:
-      [1,2,3], 4       -> ([1,2,3], 4)
-      "hello", True   -> ("hello", True)
-      1,2,3,4          -> (1, 2, 3, 4)
-
-    Supports numbers, strings, lists, dicts, booleans, None.
+    Safely parse Python literals: ints, lists, tuples, dicts, strings, booleans.
     """
-    # wrap in parentheses to enforce tuple
     try:
         node = ast.parse(f"({sig})", mode="eval")
         result = eval(compile(node, "<input>", "eval"))
-        if not isinstance(result, tuple):
-            return (result,)
-        return result
+        return result if isinstance(result, tuple) else (result,)
     except Exception as e:
-        raise ValueError(f"Invalid input signature '{sig}': {e}")
+        raise ValueError(f"Invalid input '{sig}': {e}")
 
 
 def prompt_for_args() -> tuple:
-    """Prompt user to enter args until they type 'done'."""
-    console_args = []
-    console_args.append(Prompt.ask("Enter comma-separated args (e.g. [1,2,3], 4)"))
+    console = Console()
+    val = Prompt.ask("Enter args (e.g. [1,2,3], 4)")
     try:
-        return parse_input(console_args[0])
+        return parse_input(val)
     except ValueError as e:
-        print(e)
+        console.print(f"[red]{e}[/red]")
         return prompt_for_args()
+
+
+def safe_command(fn):
+    """
+    Decorator to catch exceptions in CLI commands and print errors gracefully.
+    """
+
+    def wrapped(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as e:
+            rprint(f"[bold red]Error:[/bold red] {e}")
+
+    return wrapped
