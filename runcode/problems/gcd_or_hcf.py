@@ -11,8 +11,9 @@ from typing import List, Any
 class Problem:
     title: str = "GCD Or HCF"  # e.g. "Two Sum"
     description: str = """You are given two integers n1 and n2. You need find the Greatest Common Divisor (GCD) of the two given numbers. Return the GCD of the two numbers.
-
-The Greatest Common Divisor (GCD) of two integers is the largest positive integer that divides both of the integers."""  # e.g. "Return indices of two nums adding to target."
+                            The Greatest Common Divisor (GCD) of two integers is the largest positive integer that divides both of the integers."""  # e.g. "Return indices of two nums adding to target."
+    tags: List[str] = ["math", "gcd", "hcf", "greatest common divisor"]
+    notes: str = """The GCD of two numbers can be calculated using the Euclidean algorithm. The algorithm is based on the principle that the GCD of two numbers also divides their difference. The steps are as follows:"""
 
     @staticmethod
     def user_solution(n1: int, n2: int) -> Any:

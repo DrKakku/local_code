@@ -21,14 +21,47 @@ class Runner:
             self.problem = module.Problem
             self.name = problem_name
         except ModuleNotFoundError as e:
-            console.print(f"[red]Error: Problem module '{problem_name}' not found.[/red]")
+            console.print(
+                f"[red]Error: Problem module '{problem_name}' not found.[/red]"
+            )
             raise e
 
-    def run_tests(self, custom_tests=None):
+    def run_tests(self, custom_tests=None, return_results=False, print_results=True):
         tests = custom_tests or self.problem.tests
         results = [self._run_single(idx, test) for idx, test in enumerate(tests, 1)]
-        self._print_summary(results)
-        self._print_details(results)
+
+        # Add analytics for summary table
+        total = len(results)
+        passed = sum(r["status"] for r in results)
+        failed = total - passed
+        times = [r["time"] for r in results]
+        avg_time = sum(times) / total if total else 0.0
+        min_time = min(times) if times else 0.0
+        max_time = max(times) if times else 0.0
+        pass_rate = (passed / total) * 100 if total else 0.0
+        failed_indices = [r["idx"] for r in results if not r["status"]]
+        # Attach analytics to results for summary
+        results = [
+            {
+                **r,
+                "total": total,
+                "passed": passed,
+                "failed": failed,
+                "avg_time": avg_time,
+                "min_time": min_time,
+                "max_time": max_time,
+                "pass_rate": pass_rate,
+                "failed_indices": failed_indices,
+            }
+            for r in results
+        ]
+
+        if print_results:
+            self._print_summary(results)
+            self._print_details(results)
+
+        if return_results:
+            return results
 
     def _run_single(self, idx, test):
         args = test.get("input", ())
@@ -46,7 +79,11 @@ class Runner:
             got_val = f"Error: {e}"
             status = False
 
-        duration = (time.perf_counter() - start_time) * 1000  # Convert to milliseconds
+        duration = (
+            (time.perf_counter() - start_time) / 1000
+            if False
+            else (time.perf_counter() - start_time) * 1000
+        )  # ms
         out_str = buf.getvalue().strip()
 
         # Run reference solution only if expected output is not provided
@@ -61,8 +98,9 @@ class Runner:
                 status = False
 
         self._log_submission(idx, status, duration, exp_str, got_val)
-        return self._format_result(idx, args, exp_str, got_val, duration, out_str, status)
-
+        return self._format_result(
+            idx, args, exp_str, got_val, duration, out_str, status
+        )
 
     def _get_reference_output(self, args):
         try:
@@ -96,18 +134,34 @@ class Runner:
     def _print_summary(self, results):
         total = len(results)
         passed = sum(r["status"] for r in results)
-        avg_time = (sum(r["time"] for r in results) / total) if total else 0
+        failed = total - passed
+        times = [r["time"] for r in results]
+        avg_time = round(sum(times) / total, 1) if total else 0.0
+        min_time = round(min(times), 1) if times else 0.0
+        max_time = round(max(times), 1) if times else 0.0
+        pass_rate = round((passed / total) * 100, 1) if total else 0.0
+        failed_indices = [str(r["idx"]) for r in results if not r["status"]]
 
         tbl = Table(box=box.SIMPLE_HEAVY)
-        summary_data = [
-            ("🎯 Total", total),
-            ("✅ Passed", passed),
-            ("❌ Failed", total - passed),
-            ("⏱️ Avg(ms)", f"{avg_time:.2f}"),
-        ]
-        for label, val in summary_data:
-            tbl.add_column(label, justify="center")
-        tbl.add_row(*(str(v) for _, v in summary_data))
+        tbl.add_column("🎯 Total", justify="center")
+        tbl.add_column("✅ Passed", justify="center")
+        tbl.add_column("❌ Failed", justify="center")
+        tbl.add_column("⏱️ Avg (ms)", justify="center")
+        tbl.add_column("⏱️ Min (ms)", justify="center")
+        tbl.add_column("⏱️ Max (ms)", justify="center")
+        tbl.add_column("🏆 Pass Rate (%)", justify="center")
+        tbl.add_column("❌ Failed Indices", justify="center")
+
+        tbl.add_row(
+            str(total),
+            str(passed),
+            str(failed),
+            f"{avg_time} ms",
+            f"{min_time} ms",
+            f"{max_time} ms",
+            f"{pass_rate}%",
+            ", ".join(failed_indices) if failed_indices else "-",
+        )
 
         console.print(Panel(tbl, title="🚀 Test Summary 🚀", box=box.ROUNDED))
 
