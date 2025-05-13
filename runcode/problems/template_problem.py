@@ -1,5 +1,6 @@
 from typing import List, Any
 
+
 # ==== TEMPLATE PROBLEM ====
 # 1) Update `title` and `description` below.
 # 2) Implement `user_solution` and, optionally, `reference_solution`.

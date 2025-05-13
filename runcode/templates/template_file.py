@@ -7,6 +7,7 @@ class Problem:
         {{ description }}
     """
 
+
     @staticmethod
     def user_solution(*args) -> Any:
         """
