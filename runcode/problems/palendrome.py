@@ -17,10 +17,15 @@ class Problem:
         return x == reverted_number or x == reverted_number // 10
 
     @staticmethod
-    def reference_solution(x:int) -> Any:
+    def reference_solution(x: int) -> Any:
         # Provide a correct reference solution here
-        print(f"Implement reference_solution with arguments {x}")
-        return True
+        if x < 0 or (x % 10 == 0 and x != 0):
+            return False
+        reverted_number = 0
+        while x > reverted_number:
+            reverted_number = reverted_number * 10 + x % 10
+            x //= 10
+        return x == reverted_number or x == reverted_number // 10
 
     tests = [
         # Example test case:
