@@ -27,7 +27,7 @@ def _list():
 @cli.command()
 @click.argument("problem", required=False)
 @click.option("--all", "run_all", is_flag=True)
-@click.option("--select", "pre_selected", default=None, help="Comma-separated problem numbers to run")
+@click.option("--select","-s", "pre_selected", default=None, help="Comma-separated problem numbers to run")
 def run(problem, run_all, pre_selected):
     try:
         if run_all:
@@ -53,7 +53,7 @@ def run(problem, run_all, pre_selected):
 @safe_command
 @cli.command()
 @click.argument("problem", required=False)
-@click.option("--select", "pre_selected", default=None, help="Comma-separated problem numbers to run custom tests")
+@click.option("--select","-s", "pre_selected", default=None, help="Comma-separated problem numbers to run custom tests")
 def custom(problem, pre_selected):
     try:
         # Extract nested conditional expression
@@ -76,7 +76,7 @@ def custom(problem, pre_selected):
 @click.option("--full", "-f", is_flag=True)
 @click.option("--limit", "-l", type=int)
 @click.option("--id", "entry_id", type=int)
-@click.option("--select", "pre_selected", default=None, help="Comma-separated problem numbers to view history")
+@click.option("--select","-s", "pre_selected", default=None, help="Comma-separated problem numbers to view history")
 def history(problem, full, limit, entry_id, pre_selected):
     try:
         # Extract nested conditional expression
