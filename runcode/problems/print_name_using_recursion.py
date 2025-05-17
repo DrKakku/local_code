@@ -1,5 +1,6 @@
 from typing import List, Any
 
+
 # ==== DETAILED TEMPLATE ====
 class Problem:
     title: str = "printing name using recursion n times"
@@ -11,22 +12,21 @@ no testing required here
 
     # Implement your solution function below:
     @staticmethod
-    def user_solution(n:int,name:str) -> Any:
+    def user_solution(n: int, name: str) -> Any:
         if n <= 0:
             return
-        Problem.user_solution(n-1,name)
+        Problem.user_solution(n - 1, name)
         print(name)
-        
-        
+
     # Optional reference solution:
     @staticmethod
-    def reference_solution(n:int,name:str) -> Any:
+    def reference_solution(n: int, name: str) -> Any:
         if n <= 0:
-                    return
-        Problem.reference_solution(n-1,name)
+            return
+        Problem.reference_solution(n - 1, name)
         print(name)
 
     # TEST CASES
     tests: List[dict] = [
-        {"input": (5,"Yash")},
+        {"input": (5, "Yash")},
     ]

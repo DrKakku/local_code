@@ -17,9 +17,9 @@ For example, 153 is an Armstrong number because 1³ + 5³ + 3³ = 153."""
         if 0 > n or n > 5000:
             return False
         print(0 >= n >= 5000)
-        num_arr = [int(i) for i in str(n) ]
+        num_arr = [int(i) for i in str(n)]
         print(num_arr)
-        num_sum = [(lambda x : x**len(num_arr))(i)for i in num_arr]
+        num_sum = [(lambda x: x ** len(num_arr))(i) for i in num_arr]
         print(num_sum)
         num_sum = sum(num_sum)
         print(num_sum)

@@ -1,5 +1,7 @@
 from typing import List, Any
 import math
+
+
 # ==== DETAILED TEMPLATE ====
 class Problem:
     title: str = "CHeck if a number is prime or not"
@@ -12,22 +14,21 @@ Given an integer N, check whether it is prime or not. A prime number is a number
 
     # Implement your solution function below:
     @staticmethod
-    def user_solution(x:int) -> Any:
-        if x <= 1 or x> 5000:
+    def user_solution(x: int) -> Any:
+        if x <= 1 or x > 5000:
             return False
-        for i in range(1,int(math.isqrt(x))+1):
-            print(x%i)
+        for i in range(1, int(math.isqrt(x)) + 1):
+            print(x % i)
             print(i)
-            print(x//i)
-            if x%i == 0 and i not in {1,x} :
+            print(x // i)
+            if x % i == 0 and i not in {1, x}:
                 print("will return false")
                 return False
         return True
-       
 
     # Optional reference solution:
     @staticmethod
-    def reference_solution(x:int) -> Any:
+    def reference_solution(x: int) -> Any:
         raise NotImplementedError
 
     # TEST CASES
@@ -62,7 +63,7 @@ Given an integer N, check whether it is prime or not. A prime number is a number
         {"input": (28,), "output": False},
         {"input": (29,), "output": True},
         {"input": (30,), "output": False},
-        #edge cases
+        # edge cases
         {"input": (1,), "output": False},
         {"input": (0,), "output": False},
         {"input": (-1,), "output": False},
